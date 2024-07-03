@@ -8,12 +8,12 @@ export class TimetableController {
     constructor(private readonly timetableService: TimetableService) { }
 
     @Get()
-    getTimetable(): Observable<AxiosResponse<JSON>> {
+    getTimetables(): Observable<AxiosResponse<JSON>> {
         return this.timetableService.findAll();
     }
 
     @Post()
-    getTimeTable(@Body('office_code') office_code: string,
+    getTimetable(@Body('office_code') office_code: string,
         @Body('school_code') school_code: string,
         @Body('date') date: string,
         @Body('grade') grade: string,

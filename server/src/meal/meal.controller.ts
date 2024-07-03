@@ -8,12 +8,12 @@ export class MealController {
     constructor(private readonly mealService: MealService) { }
 
     @Get()
-    getTimetable(): Observable<AxiosResponse<JSON>> {
+    getMeals(): Observable<AxiosResponse<JSON>> {
         return this.mealService.findAll();
     }
 
     @Post()
-    getTimeTable(@Body('office_code') office_code: string,
+    getMeal(@Body('office_code') office_code: string,
         @Body('school_code') school_code: string,
         @Body('date') date: string
     ): Observable<AxiosResponse<JSON>> {
