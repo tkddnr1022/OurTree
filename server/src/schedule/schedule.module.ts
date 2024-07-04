@@ -8,4 +8,4 @@ import { HttpModule } from '@nestjs/axios';
   controllers: [ScheduleController],
   providers: [ScheduleService]
 })
-export class ScheduleModule {}
+export class SchoolScheduleModule {}
