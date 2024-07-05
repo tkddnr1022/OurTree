@@ -1,18 +1,17 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { AxiosResponse } from 'axios';
-import { Observable } from 'rxjs';
+import { Model } from 'mongoose';
 import { map } from 'rxjs/operators';
+import { TimetableDocument } from './schemas/timetable.schema';
+import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class TimetableService {
-    constructor(private readonly httpService: HttpService) { }
-
-    findAll(): Observable<AxiosResponse<JSON>> {
-        return this.httpService.get('https://open.neis.go.kr/hub/hisTimetable?Type=json&ATPT_OFCDC_SC_CODE=P10&SD_SCHUL_CODE=7003982&AY=2024').pipe(
-            map((response: AxiosResponse) => response.data)
-        );
-    }
+    constructor(
+        @InjectModel('timetable') private readonly timetableModel: Model<TimetableDocument>,
+        private readonly httpService: HttpService) 
+        { }
 
     find(office_code: string, school_code: string, date: string, grade: string, class_number: string) {
         const url = 'https://open.neis.go.kr/hub/hisTimetable?Type=json';
@@ -26,5 +25,37 @@ export class TimetableService {
         return this.httpService.get(url, { params }).pipe(
             map((response: AxiosResponse) => response.data)
         );
+    }
+
+    async update(office_code: string, school_code: string, date: string, grade: string, class_number: string): Promise<string> {
+        try {
+            const data = await this.find(office_code, school_code, date, grade, class_number).toPromise();
+            if (data.hisTimetable[0].head[1].RESULT.CODE === "INFO-000") {
+                const timetableInfo = {
+                    row: data.hisTimetable[1].row,
+                    SD_SCHUL_CODE: school_code,
+                    GRADE: grade,
+                    CLASS_NM: class_number,
+                    ALL_TI_YMD: date
+                };
+                const filter = {
+                    SD_SCHUL_CODE: school_code,
+                    GRADE: grade,
+                    CLASS_NM: class_number,
+                    ALL_TI_YMD: date
+                };
+                const update = { $set: timetableInfo };
+                const options = { upsert: true, new: true };
+
+                await this.timetableModel.findOneAndUpdate(filter, update, options).exec();
+                console.log("Database access success");
+                return "success";
+            } else {
+                throw new Error(data.hisTimetable[0].head[1].RESULT.MESSAGE);
+            }
+        } catch (err) {
+            console.error('Error fetching data:', err);
+            return `Error fetching data: ${err.message}`;
+        }
     }
 }
