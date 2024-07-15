@@ -5,6 +5,7 @@ import { AxiosResponse } from 'axios';
 import { Model } from 'mongoose';
 import { map } from 'rxjs';
 import { ScheduleDocument } from './schemas/schedule.schema';
+import { ScheduleResponse } from './dto/schedule.response.dto';
 
 @Injectable()
 export class ScheduleService {
@@ -12,6 +13,7 @@ export class ScheduleService {
         @InjectModel('schedule') private readonly scheduleModel: Model<ScheduleDocument>,
         private readonly httpService: HttpService) { }
 
+    // 외부 API 요청
     find(office_code: string, school_code: string, ym: string) {
         const url = 'https://open.neis.go.kr/hub/SchoolSchedule?Type=json';
         const params = {
@@ -25,6 +27,7 @@ export class ScheduleService {
         );
     }
 
+    // DB에 업데이트
     async update(office_code: string, school_code: string, ym: string): Promise<string> {
         try {
             const data = await this.find(office_code, school_code, ym).toPromise();
@@ -50,6 +53,28 @@ export class ScheduleService {
         } catch (err) {
             console.error('Error fetching data:', err);
             return `Error fetching data: ${err.message}`;
+        }
+    }
+
+    // DB에서 불러오기
+    async get(school_code: string, ym: string): Promise<ScheduleResponse> {
+        try {
+            const filter = {
+                SD_SCHUL_CODE: school_code,
+                YEARMONTH: ym
+            };
+            const scheduleInfo = await this.scheduleModel.findOne(filter).exec();
+            console.log("Database access success");
+            return {
+                success: true,
+                data: scheduleInfo
+            }
+        } catch (err) {
+            console.error('Error fetching data:', err);
+            return {
+                success: false,
+                error: `Error fetching data: ${err.message}`
+            };
         }
     }
 }

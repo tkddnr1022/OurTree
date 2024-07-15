@@ -1,5 +1,6 @@
 import { Body, Controller, Post, Put } from '@nestjs/common';
 import { MealService } from './meal.service';
+import { MealResponse } from './dto/meal.response.dto';
 
 @Controller('meal')
 export class MealController {
@@ -7,11 +8,10 @@ export class MealController {
 
     @Post()
     getMeal(
-        @Body('office_code') office_code: string,
         @Body('school_code') school_code: string,
         @Body('date') date: string
-    ) {
-        return this.mealService.find(office_code, school_code, date);
+    ): Promise<MealResponse> {
+        return this.mealService.get(school_code, date);
     }
 
     @Put()
@@ -19,7 +19,7 @@ export class MealController {
         @Body('office_code') office_code: string,
         @Body('school_code') school_code: string,
         @Body('date') date: string
-    ){
-        return {"msg": await this.mealService.update(office_code, school_code, date)};
+    ) {
+        return { "msg": await this.mealService.update(office_code, school_code, date) };
     }
 }

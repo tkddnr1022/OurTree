@@ -5,6 +5,7 @@ import { SchoolDocument } from './schemas/school.schema';
 import { HttpService } from '@nestjs/axios';
 import { map } from 'rxjs';
 import { AxiosResponse } from 'axios';
+import { SchoolResponse } from './dto/school.response.dto';
 
 @Injectable()
 export class SchoolService {
@@ -13,6 +14,7 @@ export class SchoolService {
         private readonly httpService: HttpService
     ) { }
 
+    // 외부 API 요청
     find(office_code: string, school_code: string) {
         const url = 'https://open.neis.go.kr/hub/schoolInfo?Type=json';
         const params = {
@@ -24,6 +26,7 @@ export class SchoolService {
         );
     }
 
+    // DB에 업데이트
     async update(office_code: string, school_code: string): Promise<string> {
         try {
             const data = await this.find(office_code, school_code).toPromise();
@@ -45,6 +48,27 @@ export class SchoolService {
         } catch (err) {
             console.error('Error fetching data:', err);
             return `Error fetching data: ${err.message}`;
+        }
+    }
+
+    // DB에서 불러오기
+    async get(school_code: string): Promise<SchoolResponse> {
+        try {
+            const filter = {
+                SD_SCHUL_CODE: school_code
+            };
+            const schoolInfo = await this.schoolModel.findOne(filter).exec();
+            console.log("Database access success");
+            return {
+                success: true,
+                data: schoolInfo
+            }
+        } catch (err) {
+            console.error('Error fetching data:', err);
+            return {
+                success: false,
+                error: `Error fetching data: ${err.message}`
+            };
         }
     }
 }

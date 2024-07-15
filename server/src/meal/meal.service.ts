@@ -5,6 +5,7 @@ import { AxiosResponse } from 'axios';
 import { Model } from 'mongoose';
 import { map } from 'rxjs/operators';
 import { MealDocument } from './schemas/meal.schema';
+import { MealResponse } from './dto/meal.response.dto';
 
 @Injectable()
 export class MealService {
@@ -12,6 +13,7 @@ export class MealService {
         @InjectModel('meal') private readonly mealModel: Model<MealDocument>,
         private readonly httpService: HttpService) { }
 
+    // 외부 API 요청
     find(office_code: string, school_code: string, date: string) {
         const url = 'https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json';
         const params = {
@@ -24,6 +26,7 @@ export class MealService {
         );
     }
 
+    // DB에 업데이트
     async update(office_code: string, school_code: string, date: string): Promise<string> {
         try {
             const data = await this.find(office_code, school_code, date).toPromise();
@@ -49,6 +52,28 @@ export class MealService {
         } catch (err) {
             console.error('Error fetching data:', err);
             return `Error fetching data: ${err.message}`;
+        }
+    }
+
+    // DB에서 불러오기
+    async get(school_code: string, date: string): Promise<MealResponse> {
+        try {
+            const filter = {
+                SD_SCHUL_CODE: school_code,
+                MLSV_YMD: date
+            };
+            const mealInfo = await this.mealModel.findOne(filter).exec();
+            console.log("Database access success");
+            return {
+                success: true,
+                data: mealInfo
+            }
+        } catch (err) {
+            console.error('Error fetching data:', err);
+            return {
+                success: false,
+                error: `Error fetching data: ${err.message}`
+            };
         }
     }
 }

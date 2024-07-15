@@ -1,17 +1,17 @@
 import { Body, Controller, Post, Put } from '@nestjs/common';
 import { ScheduleService } from './schedule.service';
+import { ScheduleResponse } from './dto/schedule.response.dto';
 
 @Controller('schedule')
 export class ScheduleController {
     constructor(private readonly scheduleService: ScheduleService) { }
 
     @Post()
-    getSchedule(
-        @Body('office_code') office_code: string,
+    async getSchedule(
         @Body('school_code') school_code: string,
         @Body('ym') ym: string
-    ) {
-        return this.scheduleService.find(office_code, school_code, ym);
+    ): Promise<ScheduleResponse> {
+        return await this.scheduleService.get(school_code, ym);
     }
 
     @Put()
@@ -19,7 +19,7 @@ export class ScheduleController {
         @Body('office_code') office_code: string,
         @Body('school_code') school_code: string,
         @Body('ym') ym: string
-    ){
-        return {"msg": await this.scheduleService.update(office_code, school_code, ym)};
+    ) {
+        return { "msg": await this.scheduleService.update(office_code, school_code, ym) };
     }
 }
