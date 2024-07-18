@@ -1,3 +1,4 @@
+import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -11,12 +12,15 @@ import { ScheduleResponse } from './dto/schedule.response.dto';
 export class ScheduleService {
     constructor(
         @InjectModel('schedule') private readonly scheduleModel: Model<ScheduleDocument>,
-        private readonly httpService: HttpService) { }
+        private readonly httpService: HttpService,
+        private readonly configService: ConfigService) { }
 
     // 외부 API 요청
     find(office_code: string, school_code: string, ym: string) {
-        const url = 'https://open.neis.go.kr/hub/SchoolSchedule?Type=json';
+        const url = 'https://open.neis.go.kr/hub/SchoolSchedule';
         const params = {
+            Type: "json",
+            KEY: this.configService.get<string>("API_KEY"),
             ATPT_OFCDC_SC_CODE: office_code,
             SD_SCHUL_CODE: school_code,
             AA_FROM_YMD: `${ym}01`,

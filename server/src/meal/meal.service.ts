@@ -6,17 +6,21 @@ import { Model } from 'mongoose';
 import { map } from 'rxjs/operators';
 import { MealDocument } from './schemas/meal.schema';
 import { MealResponse } from './dto/meal.response.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class MealService {
     constructor(
         @InjectModel('meal') private readonly mealModel: Model<MealDocument>,
-        private readonly httpService: HttpService) { }
+        private readonly httpService: HttpService,
+        private readonly configService: ConfigService) { }
 
     // 외부 API 요청
     find(office_code: string, school_code: string, date: string) {
-        const url = 'https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json';
+        const url = 'https://open.neis.go.kr/hub/mealServiceDietInfo';
         const params = {
+            Type: "json",
+            KEY: this.configService.get<string>("API_KEY"),
             ATPT_OFCDC_SC_CODE: office_code,
             SD_SCHUL_CODE: school_code,
             MLSV_YMD: date

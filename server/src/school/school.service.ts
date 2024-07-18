@@ -6,18 +6,22 @@ import { HttpService } from '@nestjs/axios';
 import { map } from 'rxjs';
 import { AxiosResponse } from 'axios';
 import { SchoolResponse } from './dto/school.response.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class SchoolService {
     constructor(
         @InjectModel('school') private readonly schoolModel: Model<SchoolDocument>,
-        private readonly httpService: HttpService
+        private readonly httpService: HttpService,
+        private readonly configService: ConfigService
     ) { }
 
     // 외부 API 요청
     find(office_code: string, school_code: string) {
-        const url = 'https://open.neis.go.kr/hub/schoolInfo?Type=json';
+        const url = 'https://open.neis.go.kr/hub/schoolInfo';
         const params = {
+            Type: "json",
+            KEY: this.configService.get<string>("API_KEY"),
             ATPT_OFCDC_SC_CODE: office_code,
             SD_SCHUL_CODE: school_code,
         };

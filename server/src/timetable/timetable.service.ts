@@ -6,17 +6,22 @@ import { map } from 'rxjs/operators';
 import { TimetableDocument } from './schemas/timetable.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { TimetableResponse } from './dto/timetable.response.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class TimetableService {
     constructor(
         @InjectModel('timetable') private readonly timetableModel: Model<TimetableDocument>,
-        private readonly httpService: HttpService) { }
+        private readonly httpService: HttpService,
+        private readonly configService: ConfigService
+    ) { }
 
     // 외부 API 요청
     find(office_code: string, school_code: string, date: string, grade: string, class_number: string) {
-        const url = 'https://open.neis.go.kr/hub/hisTimetable?Type=json';
+        const url = 'https://open.neis.go.kr/hub/hisTimetable';
         const params = {
+            Type: "json",
+            KEY: this.configService.get<string>("API_KEY"),
             ATPT_OFCDC_SC_CODE: office_code,
             SD_SCHUL_CODE: school_code,
             ALL_TI_YMD: date,
