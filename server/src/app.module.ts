@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TimetableModule } from './timetable/timetable.module';
@@ -7,20 +8,24 @@ import { SchoolScheduleModule } from './schedule/schedule.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SchoolModule } from './school/school.module';
-import { ConfigModule } from '@nestjs/config';
-
-const username = encodeURIComponent("ourtree");
-const password = encodeURIComponent("@e848048");
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true
+    }),
     TimetableModule, 
     MealModule,
     SchoolModule, 
     SchoolScheduleModule, 
     ScheduleModule.forRoot(),
-    MongooseModule.forRoot(`mongodb+srv://${username}:${password}@cluster0.ry1jhyz.mongodb.net/ourtree?retryWrites=true&w=majority&appName=Cluster0`),
-    ConfigModule.forRoot()
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: `mongodb+srv://${encodeURIComponent(configService.get<string>('MONGO_USERNAME'))}:${encodeURIComponent(configService.get<string>('MONGO_PASSWORD'))}@${configService.get<string>('MONGO_URI')}`,
+      }),
+      inject: [ConfigService],
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
