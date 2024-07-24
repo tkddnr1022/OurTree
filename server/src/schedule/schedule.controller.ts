@@ -1,17 +1,19 @@
 import { Body, Controller, Post, Put } from '@nestjs/common';
 import { ScheduleService } from './schedule.service';
-import { ScheduleResponse } from './dto/schedule.response.dto';
+import { ScheduleResponseDto } from './dto/schedule-response.dto';
+import { ScheduleRequestDto } from './dto/schedule-request.dto';
+import { ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @Controller('schedule')
+@ApiTags('교육 정보 API')
 export class ScheduleController {
     constructor(private readonly scheduleService: ScheduleService) { }
 
     @Post()
-    async getSchedule(
-        @Body('school_code') school_code: string,
-        @Body('ym') ym: string
-    ): Promise<ScheduleResponse> {
-        return await this.scheduleService.get(school_code, ym);
+    @ApiOperation({summary: "학사 일정 불러오기"})
+    @ApiCreatedResponse({description: "불러오기 성공", type: ScheduleResponseDto})
+    async getSchedule(@Body() request: ScheduleRequestDto): Promise<ScheduleResponseDto> {
+        return await this.scheduleService.get(request);
     }
 
     @Put()

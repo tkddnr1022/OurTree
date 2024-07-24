@@ -5,8 +5,9 @@ import { Model } from 'mongoose';
 import { map } from 'rxjs/operators';
 import { TimetableDocument } from './schemas/timetable.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { TimetableResponse } from './dto/timetable.response.dto';
+import { TimetableResponseDto } from './dto/timetable-response.dto';
 import { ConfigService } from '@nestjs/config';
+import { TimetableRequestDto } from './dto/timetable-request.dto';
 
 @Injectable()
 export class TimetableService {
@@ -67,13 +68,13 @@ export class TimetableService {
     }
 
     // DB에서 불러오기
-    async get(school_code: string, date: string, grade: string, class_number: string): Promise<TimetableResponse> {
+    async get(request: TimetableRequestDto): Promise<TimetableResponseDto> {
         try {
             const filter = {
-                SD_SCHUL_CODE: school_code,
-                GRADE: grade,
-                CLASS_NM: class_number,
-                ALL_TI_YMD: date
+                SD_SCHUL_CODE: request.school_code,
+                GRADE: request.grade,
+                CLASS_NM: request.class_number,
+                ALL_TI_YMD: request.date
             };
             const timetableInfo = await this.timetableModel.findOne(filter).exec();
             console.log("Database access success");

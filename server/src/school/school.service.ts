@@ -5,8 +5,9 @@ import { SchoolDocument } from './schemas/school.schema';
 import { HttpService } from '@nestjs/axios';
 import { map } from 'rxjs';
 import { AxiosResponse } from 'axios';
-import { SchoolResponse } from './dto/school.response.dto';
+import { SchoolResponseDto } from './dto/school-response.dto';
 import { ConfigService } from '@nestjs/config';
+import { SchoolRequestDto } from './dto/school-request.dto';
 
 @Injectable()
 export class SchoolService {
@@ -56,10 +57,10 @@ export class SchoolService {
     }
 
     // DB에서 불러오기
-    async get(school_code: string): Promise<SchoolResponse> {
+    async get(request: SchoolRequestDto): Promise<SchoolResponseDto> {
         try {
             const filter = {
-                SD_SCHUL_CODE: school_code
+                SD_SCHUL_CODE: request.school_code
             };
             const schoolInfo = await this.schoolModel.findOne(filter).exec();
             console.log("Database access success");

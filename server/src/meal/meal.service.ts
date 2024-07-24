@@ -5,8 +5,9 @@ import { AxiosResponse } from 'axios';
 import { Model } from 'mongoose';
 import { map } from 'rxjs/operators';
 import { MealDocument } from './schemas/meal.schema';
-import { MealResponse } from './dto/meal.response.dto';
+import { MealResponseDto } from './dto/meal-response.dto';
 import { ConfigService } from '@nestjs/config';
+import { MealRequestDto } from './dto/meal-request.dto';
 
 @Injectable()
 export class MealService {
@@ -60,11 +61,11 @@ export class MealService {
     }
 
     // DB에서 불러오기
-    async get(school_code: string, date: string): Promise<MealResponse> {
+    async get(request: MealRequestDto): Promise<MealResponseDto> {
         try {
             const filter = {
-                SD_SCHUL_CODE: school_code,
-                MLSV_YMD: date
+                SD_SCHUL_CODE: request.school_code,
+                MLSV_YMD: request.date
             };
             const mealInfo = await this.mealModel.findOne(filter).exec();
             console.log("Database access success");

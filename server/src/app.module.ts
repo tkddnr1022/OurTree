@@ -8,6 +8,7 @@ import { SchoolScheduleModule } from './schedule/schedule.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SchoolModule } from './school/school.module';
+import { SwaggerModule } from '@nestjs/swagger';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { SchoolModule } from './school/school.module';
       }),
       inject: [ConfigService],
     }),
+    SwaggerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -6,7 +6,8 @@ import { AxiosResponse } from 'axios';
 import { Model } from 'mongoose';
 import { map } from 'rxjs';
 import { ScheduleDocument } from './schemas/schedule.schema';
-import { ScheduleResponse } from './dto/schedule.response.dto';
+import { ScheduleResponseDto } from './dto/schedule-response.dto';
+import { ScheduleRequestDto } from './dto/schedule-request.dto';
 
 @Injectable()
 export class ScheduleService {
@@ -61,11 +62,11 @@ export class ScheduleService {
     }
 
     // DB에서 불러오기
-    async get(school_code: string, ym: string): Promise<ScheduleResponse> {
+    async get(request: ScheduleRequestDto): Promise<ScheduleResponseDto> {
         try {
             const filter = {
-                SD_SCHUL_CODE: school_code,
-                YEARMONTH: ym
+                SD_SCHUL_CODE: request.school_code,
+                YEARMONTH: request.ym
             };
             const scheduleInfo = await this.scheduleModel.findOne(filter).exec();
             console.log("Database access success");
