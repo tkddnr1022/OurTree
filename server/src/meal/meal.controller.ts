@@ -1,8 +1,10 @@
-import { Body, Controller, Post, Put } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { MealService } from './meal.service';
-import { MealResponseDto } from './dto/meal-response.dto';
-import { MealRequestDto } from './dto/meal-request.dto';
+import { GetMealDto } from './dto/get-meal.dto';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { UpdateMealDto } from './dto/update-meal.dto';
+import { GetResponse } from 'src/interfaces/get-response';
+import { UpdateResponse } from 'src/interfaces/update-response';
 
 @Controller('meal')
 @ApiTags('교육 정보 API')
@@ -10,18 +12,16 @@ export class MealController {
     constructor(private readonly mealService: MealService) { }
 
     @Post()
-    @ApiOperation({summary: "급식표 불러오기"})
-    @ApiCreatedResponse({description: "불러오기 성공", type: MealResponseDto})
-    getMeal(@Body() request: MealRequestDto): Promise<MealResponseDto> {
+    @ApiOperation({ summary: "급식표 불러오기" })
+    @ApiCreatedResponse({ description: "불러오기 성공", type: GetResponse })
+    getMeal(@Body() request: GetMealDto): Promise<GetResponse> {
         return this.mealService.get(request);
     }
 
-    @Put()
-    async updateMeal(
-        @Body('office_code') office_code: string,
-        @Body('school_code') school_code: string,
-        @Body('date') date: string
-    ) {
-        return { "msg": await this.mealService.update(office_code, school_code, date) };
+    @Post("update")
+    @ApiOperation({ summary: "급식표 업데이트" })
+    @ApiCreatedResponse({ description: "업데이트 성공", type: UpdateResponse })
+    async updateMeal(@Body() request: UpdateMealDto): Promise<UpdateResponse> {
+        return await this.mealService.update(request);
     }
 }

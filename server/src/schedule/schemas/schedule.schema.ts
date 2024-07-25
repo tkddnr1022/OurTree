@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { ScheduleRow, ScheduleRowSchema } from './scheduleRow.schema';
+import { ScheduleRow, ScheduleRowSchema } from './schedule-row.schema';
 
 @Schema()
 export class Schedule extends Document {

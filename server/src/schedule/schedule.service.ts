@@ -6,8 +6,10 @@ import { AxiosResponse } from 'axios';
 import { Model } from 'mongoose';
 import { map } from 'rxjs';
 import { ScheduleDocument } from './schemas/schedule.schema';
-import { ScheduleResponseDto } from './dto/schedule-response.dto';
-import { ScheduleRequestDto } from './dto/schedule-request.dto';
+import { UpdateScheduleDto } from './dto/update-schedule.dto';
+import { UpdateResponse } from 'src/interfaces/update-response';
+import { GetResponse } from 'src/interfaces/get-response';
+import { GetScheduleDto } from './dto/get-schedule.dto';
 
 @Injectable()
 export class ScheduleService {
@@ -17,15 +19,15 @@ export class ScheduleService {
         private readonly configService: ConfigService) { }
 
     // 외부 API 요청
-    find(office_code: string, school_code: string, ym: string) {
+    find(request: UpdateScheduleDto) {
         const url = 'https://open.neis.go.kr/hub/SchoolSchedule';
         const params = {
             Type: "json",
             KEY: this.configService.get<string>("API_KEY"),
-            ATPT_OFCDC_SC_CODE: office_code,
-            SD_SCHUL_CODE: school_code,
-            AA_FROM_YMD: `${ym}01`,
-            AA_TO_YMD: `${ym}31`
+            ATPT_OFCDC_SC_CODE: request.office_code,
+            SD_SCHUL_CODE: request.school_code,
+            AA_FROM_YMD: `${request.ym}01`,
+            AA_TO_YMD: `${request.ym}31`
         };
         return this.httpService.get(url, { params }).pipe(
             map((response: AxiosResponse) => response.data)
@@ -33,36 +35,42 @@ export class ScheduleService {
     }
 
     // DB에 업데이트
-    async update(office_code: string, school_code: string, ym: string): Promise<string> {
+    async update(request: UpdateScheduleDto): Promise<UpdateResponse> {
         try {
-            const data = await this.find(office_code, school_code, ym).toPromise();
+            const data = await this.find(request).toPromise();
             if (data.SchoolSchedule[0].head[1].RESULT.CODE === "INFO-000") {
                 const scheduleInfo = {
                     row: data.SchoolSchedule[1].row,
-                    SD_SCHUL_CODE: school_code,
-                    YEARMONTH: ym
+                    SD_SCHUL_CODE: request.school_code,
+                    YEARMONTH: request.ym
                 };
                 const filter = {
-                    SD_SCHUL_CODE: school_code,
-                    YEARMONTH: ym
+                    SD_SCHUL_CODE: request.school_code,
+                    YEARMONTH: request.ym
                 };
                 const update = { $set: scheduleInfo };
                 const options = { upsert: true, new: true };
 
                 await this.scheduleModel.findOneAndUpdate(filter, update, options).exec();
                 console.log("Database access success");
-                return "success";
+                return {
+                    success: true,
+                    count: data.SchoolSchedule[0].head[0].list_total_count
+                };
             } else {
                 throw new Error(data.SchoolSchedule[0].head[1].RESULT.MESSAGE);
             }
         } catch (err) {
             console.error('Error fetching data:', err);
-            return `Error fetching data: ${err.message}`;
+            return {
+                success: false,
+                error: `Error fetching data: ${err.message}`
+            };
         }
     }
 
     // DB에서 불러오기
-    async get(request: ScheduleRequestDto): Promise<ScheduleResponseDto> {
+    async get(request: GetScheduleDto): Promise<GetResponse> {
         try {
             const filter = {
                 SD_SCHUL_CODE: request.school_code,

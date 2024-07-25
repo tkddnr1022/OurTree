@@ -5,9 +5,11 @@ import { Model } from 'mongoose';
 import { map } from 'rxjs/operators';
 import { TimetableDocument } from './schemas/timetable.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { TimetableResponseDto } from './dto/timetable-response.dto';
 import { ConfigService } from '@nestjs/config';
-import { TimetableRequestDto } from './dto/timetable-request.dto';
+import { UpdateTimetableDto } from './dto/update-timetable.dto';
+import { UpdateResponse } from 'src/interfaces/update-response';
+import { GetTimetableDto } from './dto/get-timetable.dto';
+import { GetResponse } from 'src/interfaces/get-response';
 
 @Injectable()
 export class TimetableService {
@@ -18,16 +20,17 @@ export class TimetableService {
     ) { }
 
     // 외부 API 요청
-    find(office_code: string, school_code: string, date: string, grade: string, class_number: string) {
+    find(request: UpdateTimetableDto) {
         const url = 'https://open.neis.go.kr/hub/hisTimetable';
         const params = {
             Type: "json",
             KEY: this.configService.get<string>("API_KEY"),
-            ATPT_OFCDC_SC_CODE: office_code,
-            SD_SCHUL_CODE: school_code,
-            ALL_TI_YMD: date,
-            GRADE: grade,
-            CLASS_NM: class_number
+            ATPT_OFCDC_SC_CODE: request.office_code,
+            SD_SCHUL_CODE: request.school_code,
+            GRADE: request.grade,
+            CLASS_NM: request.class_number,
+            TI_FROM_YMD: request.date_start,
+            TI_TO_YMD: request.date_end
         };
         return this.httpService.get(url, { params }).pipe(
             map((response: AxiosResponse) => response.data)
@@ -35,48 +38,53 @@ export class TimetableService {
     }
 
     // DB에 업데이트
-    async update(office_code: string, school_code: string, date: string, grade: string, class_number: string): Promise<string> {
+    async update(request: UpdateTimetableDto): Promise<UpdateResponse> {
         try {
-            const data = await this.find(office_code, school_code, date, grade, class_number).toPromise();
+            const data = await this.find(request).toPromise();
             if (data.hisTimetable[0].head[1].RESULT.CODE === "INFO-000") {
-                const timetableInfo = {
-                    row: data.hisTimetable[1].row,
-                    SD_SCHUL_CODE: school_code,
-                    GRADE: grade,
-                    CLASS_NM: class_number,
-                    ALL_TI_YMD: date
-                };
-                const filter = {
-                    SD_SCHUL_CODE: school_code,
-                    GRADE: grade,
-                    CLASS_NM: class_number,
-                    ALL_TI_YMD: date
-                };
-                const update = { $set: timetableInfo };
-                const options = { upsert: true, new: true };
+                let count = 0;
+                for (const timetableInfo of data.hisTimetable[1].row) {
+                    const filter = {
+                        SD_SCHUL_CODE: timetableInfo.SD_SCHUL_CODE,
+                        ALL_TI_YMD: timetableInfo.ALL_TI_YMD,
+                        GRADE: timetableInfo.GRADE,
+                        CLASS_NM: timetableInfo.CLASS_NM,
+                        PERIO: timetableInfo.PERIO,
+                        ITRT_CNTNT: timetableInfo.ITRT_CNTNT
+                    };
+                    const update = { $set: timetableInfo };
+                    const options = { upsert: true, new: true };
 
-                await this.timetableModel.findOneAndUpdate(filter, update, options).exec();
+                    await this.timetableModel.findOneAndUpdate(filter, update, options).exec();
+                    count++;
+                }
                 console.log("Database access success");
-                return "success";
+                return {
+                    success: true,
+                    count: count
+                };
             } else {
                 throw new Error(data.hisTimetable[0].head[1].RESULT.MESSAGE);
             }
         } catch (err) {
             console.error('Error fetching data:', err);
-            return `Error fetching data: ${err.message}`;
+            return {
+                success: false,
+                error: `Error fetching data: ${err.message}`
+            };
         }
     }
 
     // DB에서 불러오기
-    async get(request: TimetableRequestDto): Promise<TimetableResponseDto> {
+    async get(request: GetTimetableDto): Promise<GetResponse> {
         try {
             const filter = {
                 SD_SCHUL_CODE: request.school_code,
+                ALL_TI_YMD: request.date,
                 GRADE: request.grade,
-                CLASS_NM: request.class_number,
-                ALL_TI_YMD: request.date
+                CLASS_NM: request.class_number
             };
-            const timetableInfo = await this.timetableModel.findOne(filter).exec();
+            const timetableInfo = await this.timetableModel.find(filter).exec();
             console.log("Database access success");
             return {
                 success: true,

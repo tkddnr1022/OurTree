@@ -1,8 +1,10 @@
-import { Body, Controller, Post, Put } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { TimetableService } from './timetable.service';
-import { TimetableResponseDto } from './dto/timetable-response.dto';
-import { TimetableRequestDto } from './dto/timetable-request.dto';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { GetResponse } from 'src/interfaces/get-response';
+import { GetTimetableDto } from './dto/get-timetable.dto';
+import { UpdateTimetableDto } from './dto/update-timetable.dto';
+import { UpdateResponse } from 'src/interfaces/update-response';
 
 @Controller('timetable')
 @ApiTags("교육 정보 API")
@@ -10,20 +12,16 @@ export class TimetableController {
     constructor(private readonly timetableService: TimetableService) { }
 
     @Post()
-    @ApiOperation({summary: "시간표 불러오기"})
-    @ApiCreatedResponse({description: "불러오기 성공", type: TimetableResponseDto})
-    getTimetable(@Body() request: TimetableRequestDto): Promise<TimetableResponseDto> {
+    @ApiOperation({ summary: "시간표 불러오기" })
+    @ApiCreatedResponse({ description: "불러오기 성공", type: GetResponse })
+    getTimetable(@Body() request: GetTimetableDto): Promise<GetResponse> {
         return this.timetableService.get(request);
     }
 
-    @Put()
-    async updateTimetable(
-        @Body('office_code') office_code: string,
-        @Body('school_code') school_code: string,
-        @Body('date') date: string,
-        @Body('grade') grade: string,
-        @Body('class_number') class_number: string
-    ) {
-        return { "msg": await this.timetableService.update(office_code, school_code, date, grade, class_number) };
+    @Post("update")
+    @ApiOperation({ summary: "시간표 업데이트" })
+    @ApiCreatedResponse({ description: "업데이트 성공", type: UpdateResponse })
+    async updateTimetable(@Body() request: UpdateTimetableDto): Promise<UpdateResponse> {
+        return await this.timetableService.update(request);
     }
 }
