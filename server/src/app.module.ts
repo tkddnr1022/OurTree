@@ -9,6 +9,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SchoolModule } from './school/school.module';
 import { SwaggerModule } from '@nestjs/swagger';
+import { BoardModule } from './board/board.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { SwaggerModule } from '@nestjs/swagger';
       inject: [ConfigService],
     }),
     SwaggerModule,
+    BoardModule,
   ],
   controllers: [AppController],
   providers: [AppService],
