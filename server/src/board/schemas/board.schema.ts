@@ -9,7 +9,7 @@ export class Board extends Document {
   @Prop({ required: true })
   name: string;
 
-  @Prop()
+  @Prop({ default: "" })
   description: string;
 
   @Prop({ required: true, default: true })

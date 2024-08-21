@@ -10,6 +10,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { SchoolModule } from './school/school.module';
 import { SwaggerModule } from '@nestjs/swagger';
 import { BoardModule } from './board/board.module';
+import { CounterModule } from './counter/counter.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { BoardModule } from './board/board.module';
     }),
     SwaggerModule,
     BoardModule,
+    CounterModule,
   ],
   controllers: [AppController],
   providers: [AppService],

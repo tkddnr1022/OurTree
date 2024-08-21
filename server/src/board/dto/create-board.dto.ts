@@ -2,6 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsBoolean, IsOptional } from 'class-validator';
 
 export class CreateBoardDto {
+    id?: number;
+
     @ApiProperty({ description: "게시판 이름" })
     @IsString()
     @IsNotEmpty()

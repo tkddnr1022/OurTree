@@ -10,16 +10,19 @@ import { UpdateBoardDto } from './dto/update-board.dto';
 import { UpdateResponse } from 'src/interfaces/update-response';
 import { DeleteBoardDto } from './dto/delete-board.dto';
 import { DeleteResponse } from 'src/interfaces/delete-response';
+import { CounterService } from 'src/counter/counter.service';
 
 @Injectable()
 export class BoardService {
     constructor(
-        @InjectModel('board') private readonly boardModel: Model<BoardDocument>
+        @InjectModel('board') private readonly boardModel: Model<BoardDocument>,
+        private readonly counterService: CounterService
     ) { }
 
     // DB에 생성
     async create(request: CreateBoardDto): Promise<CreateResponse> {
         try {
+            request.id = await this.counterService.getSequenceValue('board');
             const boardInfo = await new this.boardModel(request).save();
             console.log("Database access success");
             return {
@@ -38,9 +41,7 @@ export class BoardService {
     // DB에서 불러오기
     async get(request: GetBoardDto): Promise<GetResponse> {
         try {
-            const filter = {
-                id: request.id
-            };
+            const filter = request.id !== undefined ? { id: request.id } : {};
             const boardInfo = await this.boardModel.find(filter).exec();
             console.log("Database access success");
             return {
