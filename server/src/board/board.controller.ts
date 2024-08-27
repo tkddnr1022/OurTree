@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Patch, Post, Query } from '@nestjs/common';
 import { BoardService } from './board.service';
-import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetResponse } from 'src/interfaces/get-response';
 import { GetBoardDto } from './dto/get-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
@@ -10,6 +10,7 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { DeleteResponse } from 'src/interfaces/delete-response';
 import { DeleteBoardDto } from './dto/delete-board.dto';
 
+@ApiTags('게시판')
 @Controller('board')
 export class BoardController {
     constructor(private readonly boardService: BoardService) { }

@@ -7,7 +7,7 @@ import { UpdateScheduleDto } from './dto/update-schedule.dto';
 import { UpdateResponse } from 'src/interfaces/update-response';
 
 @Controller('schedule')
-@ApiTags('교육 정보 API')
+@ApiTags('학사 일정')
 export class ScheduleController {
     constructor(private readonly scheduleService: ScheduleService) { }
 

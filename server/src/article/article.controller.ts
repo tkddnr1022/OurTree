@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Patch, Post, Query } from '@nestjs/common';
 import { ArticleService } from './article.service';
-import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetResponse } from 'src/interfaces/get-response';
 import { GetArticleDto } from './dto/get-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
@@ -11,6 +11,7 @@ import { DeleteResponse } from 'src/interfaces/delete-response';
 import { DeleteArticleDto } from './dto/delete-article.dto';
 import { GetArticleListDto } from './dto/get-article-list.dto';
 
+@ApiTags('게시글')
 @Controller('article')
 export class ArticleController {
     constructor(private readonly articleService: ArticleService) { }

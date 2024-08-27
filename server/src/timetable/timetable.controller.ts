@@ -7,7 +7,7 @@ import { UpdateTimetableDto } from './dto/update-timetable.dto';
 import { UpdateResponse } from 'src/interfaces/update-response';
 
 @Controller('timetable')
-@ApiTags("교육 정보 API")
+@ApiTags("시간표")
 export class TimetableController {
     constructor(private readonly timetableService: TimetableService) { }
 

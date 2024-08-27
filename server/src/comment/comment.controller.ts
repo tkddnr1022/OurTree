@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Patch, Post, Query } from '@nestjs/common';
 import { CommentService } from './comment.service';
-import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetResponse } from 'src/interfaces/get-response';
 import { GetCommentDto } from './dto/get-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
@@ -11,6 +11,7 @@ import { DeleteResponse } from 'src/interfaces/delete-response';
 import { DeleteCommentDto } from './dto/delete-comment.dto';
 import { GetCommentListDto } from './dto/get-comment-list.dto';
 
+@ApiTags('댓글')
 @Controller('comment')
 export class CommentController {
     constructor(private readonly commentService: CommentService) { }

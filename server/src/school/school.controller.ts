@@ -7,7 +7,7 @@ import { GetSchoolDto } from './dto/get-school.dto';
 import { UpdateSchoolDto } from './dto/update-school.dto';
 
 @Controller('school')
-@ApiTags('교육 정보 API')
+@ApiTags('학교 정보')
 export class SchoolController {
     constructor(private readonly schoolService: SchoolService) { }
 

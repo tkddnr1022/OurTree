@@ -7,7 +7,7 @@ import { GetResponse } from 'src/interfaces/get-response';
 import { UpdateResponse } from 'src/interfaces/update-response';
 
 @Controller('meal')
-@ApiTags('교육 정보 API')
+@ApiTags('급식표')
 export class MealController {
     constructor(private readonly mealService: MealService) { }
 
