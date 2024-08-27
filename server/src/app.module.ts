@@ -11,6 +11,7 @@ import { SchoolModule } from './school/school.module';
 import { SwaggerModule } from '@nestjs/swagger';
 import { BoardModule } from './board/board.module';
 import { CounterModule } from './counter/counter.module';
+import { ArticleModule } from './article/article.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { CounterModule } from './counter/counter.module';
     SwaggerModule,
     BoardModule,
     CounterModule,
+    ArticleModule,
   ],
   controllers: [AppController],
   providers: [AppService],
