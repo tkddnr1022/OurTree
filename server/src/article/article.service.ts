@@ -123,4 +123,18 @@ export class ArticleService {
             };
         }
     }
+
+    async increaseComment(id: number): Promise<void> {
+        await this.articleModel.findOneAndUpdate(
+            { id: id },
+            { $inc: { commentCount: 1 } }
+        );
+    }
+
+    async decreaseComment(id: number): Promise<void> {
+        await this.articleModel.findOneAndUpdate(
+            { id: id },
+            { $inc: { commentCount: -1 } }
+        );
+    }
 }

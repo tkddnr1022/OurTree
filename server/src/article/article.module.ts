@@ -9,6 +9,7 @@ import { BoardModule } from 'src/board/board.module';
 @Module({
   imports: [CounterModule, BoardModule, MongooseModule.forFeature([{ name: 'article', schema: ArticleSchema }])],
   providers: [ArticleService],
-  controllers: [ArticleController]
+  controllers: [ArticleController],
+  exports: [ArticleService]
 })
 export class ArticleModule {}
