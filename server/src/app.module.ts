@@ -13,6 +13,7 @@ import { BoardModule } from './board/board.module';
 import { CounterModule } from './counter/counter.module';
 import { ArticleModule } from './article/article.module';
 import { CommentModule } from './comment/comment.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { CommentModule } from './comment/comment.module';
     BoardModule,
     ArticleModule,
     CommentModule,
+    ChatModule
   ],
   controllers: [AppController],
   providers: [AppService],
