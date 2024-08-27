@@ -98,4 +98,18 @@ export class BoardService {
             };
         }
     }
+
+    async increaseArticle(id: number): Promise<void> {
+        await this.boardModel.findOneAndUpdate(
+            { id: id },
+            { $inc: { articleCount: 1 } }
+        );
+    }
+
+    async decreaseArticle(id: number): Promise<void> {
+        await this.boardModel.findOneAndUpdate(
+            { id: id },
+            { $inc: { articleCount: -1 } }
+        );
+    }
 }

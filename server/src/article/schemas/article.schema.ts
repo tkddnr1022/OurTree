@@ -18,12 +18,6 @@ export class Article extends Document {
   @Prop({ required: true })
   boardId: number;
 
-  @Prop({ required: true, default: Date.now })
-  createdAt: Date;
-
-  @Prop({ required: true, default: Date.now })
-  updatedAt: Date;
-
   @Prop({ required: true, default: 0 })
   likeCount: number;
 

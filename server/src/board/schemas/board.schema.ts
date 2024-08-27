@@ -15,14 +15,8 @@ export class Board extends Document {
   @Prop({ required: true, default: true })
   isActive: boolean;
 
-  @Prop({ required: true, default: Date.now })
-  createdAt: Date;
-
-  @Prop({ required: true, default: Date.now })
-  updatedAt: Date;
-
   @Prop({ required: true, default: 0 })
-  postCount: number;
+  articleCount: number;
 }
 
 export type BoardDocument = Board & Document;

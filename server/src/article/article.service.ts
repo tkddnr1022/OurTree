@@ -1,3 +1,4 @@
+import { BoardService } from './../board/board.service';
 import { Injectable } from '@nestjs/common';
 import { ArticleDocument } from './schemas/article.schema';
 import { Model } from 'mongoose';
@@ -17,7 +18,8 @@ import { GetArticleListDto } from './dto/get-article-list.dto';
 export class ArticleService {
     constructor(
         @InjectModel('article') private readonly articleModel: Model<ArticleDocument>,
-        private readonly counterService: CounterService
+        private readonly counterService: CounterService,
+        private readonly boardService: BoardService
     ) { }
 
     // DB에 생성
@@ -25,6 +27,7 @@ export class ArticleService {
         try {
             request.id = await this.counterService.getSequenceValue('article');
             const articleInfo = await new this.articleModel(request).save();
+            await this.boardService.increaseArticle(request.boardId);
             console.log("Database access success");
             return {
                 success: true,
@@ -105,7 +108,9 @@ export class ArticleService {
             const filter = {
                 id: request.id
             };
+            const boardId = (await this.articleModel.findOne(filter).exec()).boardId;
             await this.articleModel.deleteOne(filter).exec();
+            await this.boardService.decreaseArticle(boardId);
             console.log("Database access success");
             return {
                 success: true
