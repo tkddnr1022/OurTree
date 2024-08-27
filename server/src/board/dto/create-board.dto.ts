@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsBoolean, IsOptional } from 'class-validator';
 
 export class CreateBoardDto {
@@ -9,12 +9,12 @@ export class CreateBoardDto {
     @IsNotEmpty()
     name: string;
 
-    @ApiProperty({ description: "게시판 설명" })
+    @ApiPropertyOptional({ description: "게시판 설명" })
     @IsString()
     @IsOptional()
     description?: string;
 
-    @ApiProperty({ description: "게시판 상태" })
+    @ApiPropertyOptional({ description: "게시판 상태" })
     @IsBoolean()
     @IsOptional()
     isActive?: boolean;
