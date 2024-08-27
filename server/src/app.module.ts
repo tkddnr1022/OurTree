@@ -12,6 +12,7 @@ import { SwaggerModule } from '@nestjs/swagger';
 import { BoardModule } from './board/board.module';
 import { CounterModule } from './counter/counter.module';
 import { ArticleModule } from './article/article.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -31,9 +32,10 @@ import { ArticleModule } from './article/article.module';
       inject: [ConfigService],
     }),
     SwaggerModule,
-    BoardModule,
     CounterModule,
+    BoardModule,
     ArticleModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
