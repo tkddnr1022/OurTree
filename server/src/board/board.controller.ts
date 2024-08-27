@@ -22,10 +22,17 @@ export class BoardController {
     }
 
     @Get()
-    @ApiOperation({ summary: "게시판 목록 불러오기" })
+    @ApiOperation({ summary: "게시판 불러오기" })
     @ApiOkResponse({ description: "불러오기 성공", type: GetResponse })
     async getBoard(@Query() request: GetBoardDto): Promise<GetResponse> {
         return await this.boardService.get(request);
+    }
+
+    @Get('list')
+    @ApiOperation({ summary: "게시판 목록 불러오기" })
+    @ApiOkResponse({ description: "불러오기 성공", type: GetResponse })
+    async getBoardList(): Promise<GetResponse> {
+        return await this.boardService.getList();
     }
 
     @Patch()

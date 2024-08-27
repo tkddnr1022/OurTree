@@ -57,6 +57,24 @@ export class BoardService {
         }
     }
 
+    // DB에서 불러오기
+    async getList(): Promise<GetResponse> {
+        try {
+            const boardInfo = await this.boardModel.find().exec();
+            console.log("Database access success");
+            return {
+                success: true,
+                data: boardInfo
+            }
+        } catch (err) {
+            console.error('Error fetching data:', err);
+            return {
+                success: false,
+                error: `Error fetching data: ${err.message}`
+            };
+        }
+    }
+
     // DB에 업데이트
     async update(request: UpdateBoardDto): Promise<UpdateResponse> {
         try {
