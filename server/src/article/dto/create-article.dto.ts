@@ -17,7 +17,7 @@ export class CreateArticleDto {
     @ApiProperty({ description: "게시글 작성자" })
     @IsString()
     @IsNotEmpty()
-    author: string;
+    authorId: string;
 
     @ApiProperty({ description: "게시판 ID" })
     @IsNumber()

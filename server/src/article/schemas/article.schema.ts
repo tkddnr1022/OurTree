@@ -13,7 +13,7 @@ export class Article extends Document {
   description: string;
 
   @Prop({ required: true })
-  author: string;
+  authorId: string;
 
   @Prop({ required: true })
   boardId: number;
