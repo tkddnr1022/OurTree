@@ -12,7 +12,7 @@ export class CreateCommentDto {
     @ApiProperty({ description: "댓글 작성자" })
     @IsString()
     @IsNotEmpty()
-    author: string;
+    authorId: string;
 
     @ApiProperty({ description: "게시글 ID" })
     @IsNumber()

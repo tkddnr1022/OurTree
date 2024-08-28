@@ -10,7 +10,7 @@ export class Comment extends Document {
   description: string;
 
   @Prop({ required: true })
-  author: string;
+  authorId: string;
 
   @Prop({ required: true })
   articleId: number;
