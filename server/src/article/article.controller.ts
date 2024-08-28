@@ -10,6 +10,7 @@ import { CreateArticleDto } from './dto/create-article.dto';
 import { DeleteResponse } from 'src/interfaces/delete-response';
 import { DeleteArticleDto } from './dto/delete-article.dto';
 import { GetArticleListDto } from './dto/get-article-list.dto';
+import { SearchArticleDto } from './dto/search-article.dto';
 
 @ApiTags('게시글')
 @Controller('article')
@@ -37,17 +38,24 @@ export class ArticleController {
         return await this.articleService.getList(request);
     }
 
+    @Get('search')
+    @ApiOperation({ summary: "게시글 검색하기" })
+    @ApiOkResponse({ description: "검색 성공", type: GetResponse })
+    async searchArticle(@Query() request: SearchArticleDto): Promise<GetResponse> {
+        return await this.articleService.search(request);
+    }
+
     @Patch()
-    @ApiOperation({ summary: "게시글 수정"})
-    @ApiOkResponse({ description: "수정 성공", type: UpdateResponse})
-    async updateArticle(@Body() request: UpdateArticleDto): Promise<UpdateResponse>{
+    @ApiOperation({ summary: "게시글 수정" })
+    @ApiOkResponse({ description: "수정 성공", type: UpdateResponse })
+    async updateArticle(@Body() request: UpdateArticleDto): Promise<UpdateResponse> {
         return await this.articleService.update(request);
     }
 
     @Delete()
-    @ApiOperation({ summary: "게시글 삭제"})
-    @ApiNoContentResponse({ description: "삭제 성공", type: DeleteResponse})
-    async deleteArticle(@Body() request: DeleteArticleDto): Promise<DeleteResponse>{
+    @ApiOperation({ summary: "게시글 삭제" })
+    @ApiNoContentResponse({ description: "삭제 성공", type: DeleteResponse })
+    async deleteArticle(@Body() request: DeleteArticleDto): Promise<DeleteResponse> {
         return await this.articleService.delete(request);
     }
 }

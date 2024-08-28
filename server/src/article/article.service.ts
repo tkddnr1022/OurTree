@@ -13,6 +13,7 @@ import { DeleteResponse } from 'src/interfaces/delete-response';
 import { CounterService } from 'src/counter/counter.service';
 import { GetArticleListDto } from './dto/get-article-list.dto';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { SearchArticleDto } from './dto/search-article.dto';
 
 @Injectable()
 export class ArticleService {
@@ -115,6 +116,36 @@ export class ArticleService {
             return {
                 success: true
             };
+        } catch (err) {
+            console.error('Error fetching data:', err);
+            return {
+                success: false,
+                error: `Error fetching data: ${err.message}`
+            };
+        }
+    }
+
+    // DB에서 검색
+    async search(request: SearchArticleDto): Promise<GetResponse> {
+        try {
+            const limit = 10;   // 페이지 당 10개 결과로 제한
+            const skip = (request.page - 1) * limit;
+            const regex = new RegExp(request.keyword, 'i');
+            const filter: any = {
+                $or: [
+                    { title: { $regex: regex } },
+                    { description: { $regex: regex } }
+                ]
+            };
+            if (request.boardId !== undefined) {
+                filter.boardId = request.boardId;
+            }
+            const articleInfo = await this.articleModel.find(filter).skip(skip).limit(limit).exec();
+            console.log("Database access success");
+            return {
+                success: true,
+                data: articleInfo
+            }
         } catch (err) {
             console.error('Error fetching data:', err);
             return {
