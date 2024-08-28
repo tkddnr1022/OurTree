@@ -1,4 +1,3 @@
-import { BoardService } from './../board/board.service';
 import { Injectable } from '@nestjs/common';
 import { ArticleDocument } from './schemas/article.schema';
 import { Model } from 'mongoose';
@@ -13,13 +12,14 @@ import { DeleteArticleDto } from './dto/delete-article.dto';
 import { DeleteResponse } from 'src/interfaces/delete-response';
 import { CounterService } from 'src/counter/counter.service';
 import { GetArticleListDto } from './dto/get-article-list.dto';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class ArticleService {
     constructor(
         @InjectModel('article') private readonly articleModel: Model<ArticleDocument>,
         private readonly counterService: CounterService,
-        private readonly boardService: BoardService
+        private readonly eventEmitter: EventEmitter2
     ) { }
 
     // DB에 생성
@@ -27,7 +27,7 @@ export class ArticleService {
         try {
             request.id = await this.counterService.getSequenceValue('article');
             const articleInfo = await new this.articleModel(request).save();
-            await this.boardService.increaseArticle(request.boardId);
+            this.eventEmitter.emit('article.created', request.boardId);
             console.log("Database access success");
             return {
                 success: true,
@@ -110,7 +110,7 @@ export class ArticleService {
             };
             const boardId = (await this.articleModel.findOne(filter).exec()).boardId;
             await this.articleModel.deleteOne(filter).exec();
-            await this.boardService.decreaseArticle(boardId);
+            this.eventEmitter.emit('article.deleted', { articleId: request.id, boardId: boardId });
             console.log("Database access success");
             return {
                 success: true
@@ -124,6 +124,15 @@ export class ArticleService {
         }
     }
 
+    @OnEvent('board.deleted')
+    async deleteMany(boardId: number): Promise<void> {
+        const articles = await this.articleModel.find({ boardId: boardId }).exec();
+        const articleIds = articles.map(article => article.id);
+        this.eventEmitter.emit('articles.deleted', articleIds);
+        await this.articleModel.deleteMany({ boardId: boardId });
+    }
+
+    @OnEvent('comment.created')
     async increaseComment(id: number): Promise<void> {
         await this.articleModel.findOneAndUpdate(
             { id: id },
@@ -131,6 +140,7 @@ export class ArticleService {
         );
     }
 
+    @OnEvent('comment.deleted')
     async decreaseComment(id: number): Promise<void> {
         await this.articleModel.findOneAndUpdate(
             { id: id },

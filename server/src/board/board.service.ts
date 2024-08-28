@@ -11,12 +11,14 @@ import { UpdateResponse } from 'src/interfaces/update-response';
 import { DeleteBoardDto } from './dto/delete-board.dto';
 import { DeleteResponse } from 'src/interfaces/delete-response';
 import { CounterService } from 'src/counter/counter.service';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class BoardService {
     constructor(
         @InjectModel('board') private readonly boardModel: Model<BoardDocument>,
-        private readonly counterService: CounterService
+        private readonly counterService: CounterService,
+        private readonly eventEmitter: EventEmitter2
     ) { }
 
     // DB에 생성
@@ -104,6 +106,7 @@ export class BoardService {
                 id: request.id
             };
             await this.boardModel.deleteOne(filter).exec();
+            this.eventEmitter.emit('board.deleted', request.id);
             console.log("Database access success");
             return {
                 success: true
@@ -117,6 +120,7 @@ export class BoardService {
         }
     }
 
+    @OnEvent('article.created')
     async increaseArticle(id: number): Promise<void> {
         await this.boardModel.findOneAndUpdate(
             { id: id },
@@ -124,9 +128,10 @@ export class BoardService {
         );
     }
 
-    async decreaseArticle(id: number): Promise<void> {
+    @OnEvent('article.deleted')
+    async decreaseArticle(article: any): Promise<void> {
         await this.boardModel.findOneAndUpdate(
-            { id: id },
+            { id: article.boardId },
             { $inc: { articleCount: -1 } }
         );
     }

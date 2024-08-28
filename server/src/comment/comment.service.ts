@@ -1,4 +1,3 @@
-import { ArticleService } from '../article/article.service';
 import { Injectable } from '@nestjs/common';
 import { CommentDocument } from './schemas/comment.schema';
 import { Model } from 'mongoose';
@@ -13,13 +12,14 @@ import { DeleteCommentDto } from './dto/delete-comment.dto';
 import { DeleteResponse } from 'src/interfaces/delete-response';
 import { CounterService } from 'src/counter/counter.service';
 import { GetCommentListDto } from './dto/get-comment-list.dto';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class CommentService {
     constructor(
         @InjectModel('comment') private readonly commentModel: Model<CommentDocument>,
         private readonly counterService: CounterService,
-        private readonly articleService: ArticleService
+        private readonly eventEmitter: EventEmitter2
     ) { }
 
     // DB에 생성
@@ -27,7 +27,7 @@ export class CommentService {
         try {
             request.id = await this.counterService.getSequenceValue('comment');
             const commentInfo = await new this.commentModel(request).save();
-            await this.articleService.increaseComment(request.articleId);
+            this.eventEmitter.emit('comment.created', request.articleId);
             console.log("Database access success");
             return {
                 success: true,
@@ -110,7 +110,7 @@ export class CommentService {
             };
             const articleId = (await this.commentModel.findOne(filter).exec()).articleId;
             await this.commentModel.deleteOne(filter).exec();
-            await this.articleService.decreaseComment(articleId);
+            this.eventEmitter.emit('comment.deleted', articleId);
             console.log("Database access success");
             return {
                 success: true
@@ -122,5 +122,15 @@ export class CommentService {
                 error: `Error fetching data: ${err.message}`
             };
         }
+    }
+
+    @OnEvent('article.deleted')
+    async deleteMany(article: any): Promise<void> {
+        await this.commentModel.deleteMany({ articleId: article.articleId });
+    }
+
+    @OnEvent('articles.deleted')
+    async deleteMany2(articleIds: any[]): Promise<void> {
+        await this.commentModel.deleteMany({ articleId: { $in: articleIds } });
     }
 }

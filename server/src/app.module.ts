@@ -14,16 +14,13 @@ import { CounterModule } from './counter/counter.module';
 import { ArticleModule } from './article/article.module';
 import { CommentModule } from './comment/comment.module';
 import { ChatModule } from './chat/chat.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true
     }),
-    TimetableModule, 
-    MealModule,
-    SchoolModule, 
-    SchoolScheduleModule, 
     ScheduleModule.forRoot(),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -33,6 +30,11 @@ import { ChatModule } from './chat/chat.module';
       inject: [ConfigService],
     }),
     SwaggerModule,
+    EventEmitterModule.forRoot(),
+    TimetableModule, 
+    MealModule,
+    SchoolModule, 
+    SchoolScheduleModule, 
     CounterModule,
     BoardModule,
     ArticleModule,

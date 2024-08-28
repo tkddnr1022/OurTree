@@ -4,12 +4,10 @@ import { ArticleService } from './article.service';
 import { ArticleController } from './article.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ArticleSchema } from './schemas/article.schema';
-import { BoardModule } from 'src/board/board.module';
 
 @Module({
-  imports: [CounterModule, BoardModule, MongooseModule.forFeature([{ name: 'article', schema: ArticleSchema }])],
+  imports: [CounterModule, MongooseModule.forFeature([{ name: 'article', schema: ArticleSchema }])],
   providers: [ArticleService],
-  controllers: [ArticleController],
-  exports: [ArticleService]
+  controllers: [ArticleController]
 })
 export class ArticleModule {}
