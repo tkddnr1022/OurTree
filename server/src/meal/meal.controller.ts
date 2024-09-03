@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { MealService } from './meal.service';
 import { GetMealDto } from './dto/get-meal.dto';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -11,10 +11,10 @@ import { UpdateResponse } from 'src/interfaces/update-response';
 export class MealController {
     constructor(private readonly mealService: MealService) { }
 
-    @Post()
+    @Get()
     @ApiOperation({ summary: "급식표 불러오기" })
     @ApiCreatedResponse({ description: "불러오기 성공", type: GetResponse })
-    getMeal(@Body() request: GetMealDto): Promise<GetResponse> {
+    getMeal(@Query() request: GetMealDto): Promise<GetResponse> {
         return this.mealService.get(request);
     }
 

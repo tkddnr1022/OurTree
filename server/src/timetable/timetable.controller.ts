@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { TimetableService } from './timetable.service';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetResponse } from 'src/interfaces/get-response';
@@ -11,10 +11,10 @@ import { UpdateResponse } from 'src/interfaces/update-response';
 export class TimetableController {
     constructor(private readonly timetableService: TimetableService) { }
 
-    @Post()
+    @Get()
     @ApiOperation({ summary: "시간표 불러오기" })
     @ApiCreatedResponse({ description: "불러오기 성공", type: GetResponse })
-    getTimetable(@Body() request: GetTimetableDto): Promise<GetResponse> {
+    getTimetable(@Query() request: GetTimetableDto): Promise<GetResponse> {
         return this.timetableService.get(request);
     }
 
