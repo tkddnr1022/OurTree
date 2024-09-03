@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ScheduleService } from './schedule.service';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetResponse } from 'src/interfaces/get-response';
@@ -11,10 +11,10 @@ import { UpdateResponse } from 'src/interfaces/update-response';
 export class ScheduleController {
     constructor(private readonly scheduleService: ScheduleService) { }
 
-    @Post()
+    @Get()
     @ApiOperation({ summary: "학사 일정 불러오기" })
     @ApiCreatedResponse({ description: "불러오기 성공", type: GetResponse })
-    async getSchedule(@Body() request: GetScheduleDto): Promise<GetResponse> {
+    async getSchedule(@Query() request: GetScheduleDto): Promise<GetResponse> {
         return await this.scheduleService.get(request);
     }
 
